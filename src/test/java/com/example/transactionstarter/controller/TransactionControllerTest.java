@@ -3,6 +3,7 @@ package com.example.transactionstarter.controller;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import org.junit.jupiter.api.Test;
 
@@ -95,5 +96,40 @@ class TransactionControllerTest {
                         "Customer ID is required"))
                 .andExpect(jsonPath("$.errors.currency").value(
                         "Currency must contain exactly 3 characters"));
+    }
+    @Test
+    void shouldGetTransactionSuccessfully() throws Exception {
+
+        String request = """
+                {
+                    "transactionId": "TEST1003",
+                    "customerId": "CUS1003",
+                    "amount": 1500.00,
+                    "currency": "USD",
+                    "transactionType": "PAYMENT",
+                    "transactionStatus": "PENDING"
+                }
+                """;
+
+        mockMvc.perform(post("/api/transactions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/api/transactions/TEST1003"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.transactionId").value("TEST1003"))
+                .andExpect(jsonPath("$.customerId").value("CUS1003"))
+                .andExpect(jsonPath("$.amount").value(1500.00))
+                .andExpect(jsonPath("$.currency").value("USD"));
+    }
+
+    @Test
+    void shouldReturnNotFoundForUnknownTransaction() throws Exception {
+
+        mockMvc.perform(get("/api/transactions/UNKNOWN999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"));
     }
 }
