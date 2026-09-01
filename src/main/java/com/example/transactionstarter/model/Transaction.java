@@ -4,53 +4,53 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "transactions")
 public class Transaction {
 
     @Id
-    @NotBlank(message = "Transaction ID is required")
-    @Size(max = 50, message = "Transaction ID must not exceed 50 characters")
     @Column(name = "transaction_id", nullable = false, updatable = false)
     private String transactionId;
 
-    @NotBlank(message = "Customer ID is required")
-    @Size(max = 50, message = "Customer ID must not exceed 50 characters")
+    @Column(name = "idempotency_key", nullable = false, unique = true, updatable = false)
+    private String idempotencyKey;
+
     @Column(name = "customer_id", nullable = false)
     private String customerId;
 
-    @NotNull(message = "Amount is required")
-    @Positive(message = "Amount must be greater than zero")
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 
-    @NotBlank(message = "Currency is required")
-    @Size(min = 3, max = 3, message = "Currency must contain exactly 3 characters")
     @Column(nullable = false, length = 3)
     private String currency;
 
-    @NotBlank(message = "Transaction type is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_type", nullable = false)
-    private String transactionType;
+    private TransactionType transactionType;
 
-    @NotBlank(message = "Transaction status is required")
+    @Enumerated(EnumType.STRING)
     @Column(name = "transaction_status", nullable = false)
-    private String transactionStatus;
+    private TransactionStatus transactionStatus;
 
     public Transaction() {
     }
 
-    public Transaction(String transactionId, String customerId,
-                       BigDecimal amount, String currency,
-                       String transactionType, String transactionStatus) {
+    public Transaction(
+            String transactionId,
+            String idempotencyKey,
+            String customerId,
+            BigDecimal amount,
+            String currency,
+            TransactionType transactionType,
+            TransactionStatus transactionStatus) {
+
         this.transactionId = transactionId;
+        this.idempotencyKey = idempotencyKey;
         this.customerId = customerId;
         this.amount = amount;
         this.currency = currency;
@@ -64,6 +64,14 @@ public class Transaction {
 
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
+    }
+
+    public String getIdempotencyKey() {
+        return idempotencyKey;
+    }
+
+    public void setIdempotencyKey(String idempotencyKey) {
+        this.idempotencyKey = idempotencyKey;
     }
 
     public String getCustomerId() {
@@ -90,19 +98,19 @@ public class Transaction {
         this.currency = currency;
     }
 
-    public String getTransactionType() {
+    public TransactionType getTransactionType() {
         return transactionType;
     }
 
-    public void setTransactionType(String transactionType) {
+    public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
     }
 
-    public String getTransactionStatus() {
+    public TransactionStatus getTransactionStatus() {
         return transactionStatus;
     }
 
-    public void setTransactionStatus(String transactionStatus) {
+    public void setTransactionStatus(TransactionStatus transactionStatus) {
         this.transactionStatus = transactionStatus;
     }
 }
