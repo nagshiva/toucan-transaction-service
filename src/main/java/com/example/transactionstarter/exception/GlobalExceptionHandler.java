@@ -75,11 +75,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleInvalidRequest(
             HttpMessageNotReadableException ex) {
 
+        String message = "Invalid request body";
+
+        String exceptionMessage = ex.getMostSpecificCause().getMessage();
+
+        if (exceptionMessage != null) {
+
+            if (exceptionMessage.contains("BigDecimal")) {
+                message = "Amount must be a valid number";
+            }
+            else if (exceptionMessage.contains("TransactionType")) {
+                message = "Invalid transaction type. Allowed values: PAYMENT, TRANSFER, REFUND";
+            }
+            else if (exceptionMessage.contains("TransactionStatus")) {
+                message = "Invalid transaction status. Allowed values: PENDING, COMPLETED, FAILED, CANCELLED";
+            }
+        }
+
         Map<String, Object> response = new LinkedHashMap<>();
 
         response.put("error", "Invalid Request");
-        response.put("message",
-                "Invalid transaction type or status");
+        response.put("message", message);
         response.put("timestamp", LocalDateTime.now());
         response.put("status", 400);
 

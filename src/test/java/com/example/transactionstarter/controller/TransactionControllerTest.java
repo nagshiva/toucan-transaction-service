@@ -54,7 +54,8 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.amount").value(2500.50))
                 .andExpect(jsonPath("$.currency").value("USD"))
                 .andExpect(jsonPath("$.transactionType").value("PAYMENT"))
-                .andExpect(jsonPath("$.transactionStatus").value("PENDING"));
+                .andExpect(jsonPath("$.transactionStatus").value("PENDING"))
+                .andExpect(jsonPath("$.createdAt").isNotEmpty());
     }
 
 
@@ -194,7 +195,9 @@ class TransactionControllerTest {
                 .andExpect(jsonPath("$.transactionType")
                         .value("PAYMENT"))
                 .andExpect(jsonPath("$.transactionStatus")
-                        .value("PENDING"));
+                        .value("PENDING"))
+                .andExpect(jsonPath("$.createdAt")
+                		.isNotEmpty());
     }
 
 

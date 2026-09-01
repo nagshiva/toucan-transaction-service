@@ -1,7 +1,9 @@
 package com.example.transactionstarter.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,6 +38,9 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     @Column(name = "transaction_status", nullable = false)
     private TransactionStatus transactionStatus;
+    
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
     public Transaction() {
     }
@@ -57,8 +62,13 @@ public class Transaction {
         this.transactionType = transactionType;
         this.transactionStatus = transactionStatus;
     }
+    
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 
-    public String getTransactionId() {
+	public String getTransactionId() {
         return transactionId;
     }
 
@@ -113,4 +123,8 @@ public class Transaction {
     public void setTransactionStatus(TransactionStatus transactionStatus) {
         this.transactionStatus = transactionStatus;
     }
+    
+    public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
 }
