@@ -2,44 +2,43 @@ package com.example.transactionstarter.dto;
 
 import java.math.BigDecimal;
 
+import com.example.transactionstarter.model.TransactionType;
+import com.example.transactionstarter.validation.ValidCurrency;
+
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public class TransactionRequest {
 
-    @NotBlank(message = "Transaction ID is required")
-    @Size(max = 50, message = "Transaction ID must not exceed 50 characters")
-    private String transactionId;
-
     @NotBlank(message = "Customer ID is required")
     @Size(max = 50, message = "Customer ID must not exceed 50 characters")
+    @Pattern(
+            regexp = "^$|^[A-Za-z0-9_-]+$",
+            message = "Customer ID contains invalid characters"
+    )
     private String customerId;
 
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be greater than zero")
+    @Digits(
+            integer = 17,
+            fraction = 2,
+            message = "Amount must have at most 2 decimal places"
+    )
     private BigDecimal amount;
 
     @NotBlank(message = "Currency is required")
-    @Size(min = 3, max = 3, message = "Currency must contain exactly 3 characters")
+    @ValidCurrency
     private String currency;
 
-    @NotBlank(message = "Transaction type is required")
-    private String transactionType;
-
-    @NotBlank(message = "Transaction status is required")
-    private String transactionStatus;
+    @NotNull(message = "Transaction type is required")
+    private TransactionType transactionType;
 
     public TransactionRequest() {
-    }
-
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
     }
 
     public String getCustomerId() {
@@ -66,19 +65,11 @@ public class TransactionRequest {
         this.currency = currency;
     }
 
-    public String getTransactionType() {
+    public TransactionType getTransactionType() {
         return transactionType;
     }
 
-    public void setTransactionType(String transactionType) {
+    public void setTransactionType(TransactionType transactionType) {
         this.transactionType = transactionType;
-    }
-
-    public String getTransactionStatus() {
-        return transactionStatus;
-    }
-
-    public void setTransactionStatus(String transactionStatus) {
-        this.transactionStatus = transactionStatus;
     }
 }
